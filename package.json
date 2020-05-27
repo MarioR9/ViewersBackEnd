@@ -1,0 +1,23 @@
+{
+  "name": "viewersbackend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "puppeteer": "^1.9.0",
+    "proxy-chain": "^0.4.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MarioR9/ViewersBackEnd.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MarioR9/ViewersBackEnd/issues"
+  },
+  "homepage": "https://github.com/MarioR9/ViewersBackEnd#readme"
+}
