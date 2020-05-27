@@ -38,6 +38,8 @@ app.post('/api', (req, res)=>{
   console.log("Connecting to: " + newProxyUrl);
   const page = await browser.newPage();
   await page.goto(req.body.website);
+  
+  
   i++
   }
 
