@@ -6,6 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "engines": {
+    "node": "8"
+  },
   "dependencies": {
     "puppeteer": "^1.9.0",
     "proxy-chain": "^0.4.5"
