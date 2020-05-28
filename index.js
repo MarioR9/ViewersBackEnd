@@ -26,34 +26,29 @@ app.post('/api', (req, res)=>{
   console.log('i got a res');
   console.log(req.body);
 
-function toClose(req){
-    if(req.body.status === "close"){
-      return browser.close()
-    }
-}   
-
-
 (async () => {
   let i = 0
   const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox']});
+  if(req.body.status === "close"){
+    res.json({
+      status: "Success viewing has stopped!"})
+      console.log("Success stop")
+      return browser.close()
+  } 
   while(i < req.body.numOfViewers){
   const oldProxyUrl = `${serversList[i]}`;
   const newProxyUrl = await proxyChain.anonymizeProxy(oldProxyUrl);
   
   // Prints something like "Connecting to: http://127.0.0.1:45678"
-
   console.log("Connecting to: " + newProxyUrl);
   const page = await browser.newPage();
   await page.goto(req.body.website);
   i++
-
   }
-  toClose()
   res.json({
-    status: "success"})
+    status: "Success your connected with " + i + " " +"channels"})
   console.log("Success your connected with " + i + " " +"channels")
   })();
-
 
 })
 
