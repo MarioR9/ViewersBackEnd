@@ -42,8 +42,6 @@ app.post('/api', (req, res)=>{
   
   i++
   }
-
-  browser.close();
   console.log("Success your connected with " + i + " " +"channels")
 })();
   
