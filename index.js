@@ -16,6 +16,8 @@ const serversList = {
 }
 
 const app = express();
+const port = process.env.PORT || 8080
+app.listen(port)
 app.get('/', (req, res) => res.send('Viewers Server'))
 app.use(express.json({}), cors())
 
@@ -23,12 +25,17 @@ app.use(express.json({}), cors())
 app.post('/api', (req, res)=>{
   console.log('i got a res');
   console.log(req.body);
-  
+
+function toClose(req){
+    if(req.body.status === "close"){
+      return browser.close()
+    }
+}   
 
 
 (async () => {
   let i = 0
-  const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']});
+  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox']});
   while(i < req.body.numOfViewers){
   const oldProxyUrl = `${serversList[i]}`;
   const newProxyUrl = await proxyChain.anonymizeProxy(oldProxyUrl);
@@ -39,8 +46,14 @@ app.post('/api', (req, res)=>{
   const page = await browser.newPage();
   await page.goto(req.body.website);
   i++
+
   }
+  toClose()
+  res.json({
+    status: "success"})
   console.log("Success your connected with " + i + " " +"channels")
-})();
-  
+  })();
+
+
 })
+
