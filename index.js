@@ -23,7 +23,7 @@ app.use(express.json({}), cors())
 
 
 app.post('/api', (req, res)=>{
-  console.log('i got a res');
+  console.log('reques to connect');
   console.log(req.body);
  
 (async () => {
@@ -62,4 +62,6 @@ app.post('/api', (req, res)=>{
 
 })
 
-
+app.post('/server'),(req, res)=>{
+  console.log("server refresher")
+}
