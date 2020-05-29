@@ -23,13 +23,42 @@ app.use(express.json({}), cors())
 
 
 app.post('/api', (req, res)=>{
-  console.log('reques to connect');
+  console.log('reques to connect');/
   console.log(req.body);
- 
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
+  /// serverList collecting
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
+    
 (async () => {
-  
   try { 
-    let i = 0
+
+    const browser = await puppeteer.launch({headless: false});
+    const page = await browser.newPage();
+    await page.goto('https://www.us-proxy.org/', {waitUntil: 'load', timeout: 0});
+    await page.waitFor(8000);
+    await page.focus('input[type="search"]')
+    page.keyboard.type("8080") //types in search bar 8080 as the port we are trying to find
+    await page.waitFor(3000);
+    await page.evaluate(() => { 
+      document.getElementsByClassName("ui-state-default")[6].click() //click on Https filter for YES
+      document.getElementsByClassName("ui-state-default")[6].click()
+    });
+    await page.waitFor(2000);
+    await page.evaluate(() => { 
+      let serverList = []
+      let range = document.getElementsByClassName("table table-striped table-bordered dataTable")[0].children[1].children.length
+      for(let i =0; i <range; i++){
+       serverList.push(document.getElementsByClassName("table table-striped table-bordered dataTable")[0].children[1].children[i].children[0].innerText.concat(":8080"))
+      i++
+      }
+    browser.close() 
+    });
+  
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
+  /// Proxy Connections 
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
+    
+  let i = 0
   while(i < req.body.numOfViewers){
 
     if(req.body.status === "close"){
@@ -62,6 +91,4 @@ app.post('/api', (req, res)=>{
 
 })
 
-app.post('/server'),(req, res)=>{
-  console.log("server refresher")
-}
+
