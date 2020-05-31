@@ -84,12 +84,12 @@ app.post('/api2',(req, res)=>{
           return serverList1
        
         },serverList1)
-        res.json({
-          status: "Success Servers Active",
-        data: serverList})
         await browser.close()
         console.log(array)
         serverList.push(array)
+        res.json({
+          status: "Success Servers Active",
+        data: serverList.length})
         console.log("found servers")
         console.log(serverList)
   
