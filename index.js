@@ -1,19 +1,11 @@
 const express = require('express');  
 const cors = require('cors')
+
+let serverList = []
+
 const puppeteer = require('puppeteer');
 const proxyChain = require('proxy-chain');
 
-const serversList = { // https://www.us-proxy.org
-  0:"http://50.246.120.125:8080",	
-  1:"http://160.2.38.41:8080",
-  2:"http://207.144.111.230:8080",	
-  3:"http://69.92.133.126:8080",	
-  4:"http://50.233.228.147:8080",
-  5:"http://144.121.248.114:8080",
-  6:"http://205.185.115.100:8080",
-  7:"http://209.141.49.11:8080",	
-  8:"http://3.84.27.209:8080"
-}
 
 const app = express();
 const port = process.env.PORT || 8080
@@ -23,42 +15,13 @@ app.use(express.json({}), cors())
 
 
 app.post('/api', (req, res)=>{
-  console.log('reques to connect');/
+  console.log('reques to connect');
   console.log(req.body);
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
-  /// serverList collecting
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
-    
+ 
 (async () => {
-  try { 
-
-    const browser = await puppeteer.launch({headless: false});
-    const page = await browser.newPage();
-    await page.goto('https://www.us-proxy.org/', {waitUntil: 'load', timeout: 0});
-    await page.waitFor(8000);
-    await page.focus('input[type="search"]')
-    page.keyboard.type("8080") //types in search bar 8080 as the port we are trying to find
-    await page.waitFor(3000);
-    await page.evaluate(() => { 
-      document.getElementsByClassName("ui-state-default")[6].click() //click on Https filter for YES
-      document.getElementsByClassName("ui-state-default")[6].click()
-    });
-    await page.waitFor(2000);
-    await page.evaluate(() => { 
-      let serverList = []
-      let range = document.getElementsByClassName("table table-striped table-bordered dataTable")[0].children[1].children.length
-      for(let i =0; i <range; i++){
-       serverList.push(document.getElementsByClassName("table table-striped table-bordered dataTable")[0].children[1].children[i].children[0].innerText.concat(":8080"))
-      i++
-      }
-    browser.close() 
-    });
   
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
-  /// Proxy Connections 
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
-    
-  let i = 0
+  try { 
+    let i = 0
   while(i < req.body.numOfViewers){
 
     if(req.body.status === "close"){
@@ -67,7 +30,7 @@ app.post('/api', (req, res)=>{
         console.log("Success stop")
         return browser.close()
     } 
-  const oldProxyUrl = `${serversList[i]}`;
+  const oldProxyUrl = `${serverList[0][i]}`;
   const newProxyUrl = await proxyChain.anonymizeProxy(oldProxyUrl);
   const browser = await puppeteer.launch({ headless: true, args: [`--proxy-server=${newProxyUrl}`,'--no-sandbox', '--disable-setuid-sandbox',`--ignore-certificate-errors`]});
   
@@ -91,4 +54,46 @@ app.post('/api', (req, res)=>{
 
 })
 
-
+app.post('/api2',(req, res)=>{
+  console.log('reques to server');
+  console.log(req.body);
+  serverList = []
+  if(req.body.server == "active"){
+    (async () => {
+        console.log("Collecting data...")
+        const browser = await puppeteer.launch({headless: true,args: ['--no-sandbox', '--disable-setuid-sandbox',`--ignore-certificate-errors`]});
+        const page = await browser.newPage();
+        await page.setViewport({ width: 1366, height: 768});
+        await page.goto('https://www.us-proxy.org/', {waitUntil: 'load', timeout: 0});
+        await page.waitFor(8000);
+        await page.focus('input[type="search"]')
+        page.keyboard.type("8080") //types in search bar 8080 as the port we are trying to find
+        await page.waitFor(2000);
+        await page.evaluate(() => { 
+          document.getElementsByClassName("ui-state-default")[6].click() //click on Https filter for no
+         
+        });
+        await page.waitFor(2000);
+        let serverList1 = []
+        let array = await page.evaluate((serverList1) => { 
+          let range = document.getElementsByClassName("table table-striped table-bordered dataTable")[0].children[1].children.length
+          for(let i =0; i <range; i++){
+           serverList1.push("http://" + document.getElementsByClassName("table table-striped table-bordered dataTable")[0].children[1].children[i].children[0].innerText.concat(":8080"))
+          i++ 
+          }
+          return serverList1
+       
+        },serverList1)
+        res.json({
+          status: "Success Servers Active",
+        data: serverList})
+        await browser.close()
+        console.log(array)
+        serverList.push(array)
+        console.log("found servers")
+        console.log(serverList)
+  
+    })();
+  }
+  
+})
