@@ -1,1 +1,3 @@
 
+## main goal to make it compatible with the main streaming platforms.
+including twitch, facebook gaming, youtube gaming and mixer.
